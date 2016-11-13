@@ -1,0 +1,12 @@
+
+.node {
+    stroke: #222;
+    stroke-width: 1.5px;
+    fill: rgb(102, 205, 170);
+}
+
+.link {
+    stroke: #999;
+    stroke-opacity: .6;
+    stroke-width: 1px;
+}
