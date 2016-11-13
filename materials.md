@@ -14,3 +14,4 @@
 ## <a name='quadtrees'>Quadtrees
 
 * [Collision Detection](https://bl.ocks.org/mbostock/3231298)
+* [Testing d3js force directed graph with collision](http://bl.ocks.org/nilanjenator/10574638)
