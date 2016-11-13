@@ -68,6 +68,9 @@ d3.json("graph.json", function (error, graph) {
         .attr("r", function(d) { return d.radius = 50 })
         .call(force.drag);
 
+    resize();
+    d3.select(window).on("resize", resize);
+
     // html title attribute
     nodes.append("title")
         .text(function (d) { return d.title; })
@@ -117,5 +120,11 @@ function collide(node) {
         }
         return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
     };
+}
+
+function resize() {
+    width = window.innerWidth, height = window.innerHeight;
+    svg.attr("width", width).attr("height", height);
+    force.size([width, height]).resume();
 }
 </script>
