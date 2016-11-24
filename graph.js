@@ -16,7 +16,8 @@ d3.json("graph.json", function (error, graph) {
         var sourceNode = graph.nodes.filter(function(n) { return n.id === e.source; })[0],
             targetNode = graph.nodes.filter(function(n) { return n.id === e.target; })[0];
         edges.push({source: sourceNode, target: targetNode});
-    })
+    });
+
     graph.links = edges;
 
     force.nodes(graph.nodes)
@@ -29,19 +30,36 @@ d3.json("graph.json", function (error, graph) {
         .append("line")
         .attr("class", "link");
 
-    var nodes = svg.selectAll(".node")
-        .data(graph.nodes).enter()
-        .append("circle")
-        .attr("class", function (d) { return "node" })
-        .attr("r", function(d) { return d.radius = 50 })
+    var nodes = svg.append("g")
+        .attr("class", "nodes")
+        .selectAll(".node")
+        .data(graph.nodes)
+        .enter().append("g")
+        .attr("class", function(d) {
+            return "node " + d.label;
+        })
         .call(force.drag);
+
+    var movies = d3.selectAll(".movie");
+    movies.append("circle")
+        .attr("r", function(d) { return d.radius = 50; });
+
+
+    movies.append("title")
+     .text(function(d) {return d.title });
+
+    var actors = d3.selectAll(".actor")
+            .append("rect")
+            .attr("width", function(d) { return d.width = 100; })
+            .attr("height", function(d) {return d.height = 100; });
+
+    actors.append("title")
+     .text(function(d) {return d.name });
 
     resize();
     d3.select(window).on("resize", resize);
 
     // html title attribute
-    nodes.append("title")
-        .text(function (d) { return d.title; })
 
     // force feed algo ticks
     force.on("tick", function () {
@@ -51,7 +69,9 @@ d3.json("graph.json", function (error, graph) {
 
         while (++i < n) q.visit(collide(graph.nodes[i]));
 
-        nodes.attr("transform", transform);
+        //nodes.attr("transform", transform);
+        movies.attr("transform", transformMovies);
+        actors.attr("transform", transformActors);
 
         links.attr("x1", function (d) { return d.source.x; })
         .attr("y1", function (d) { return d.source.y; })
@@ -60,9 +80,19 @@ d3.json("graph.json", function (error, graph) {
     });
 });
 
-function transform(d) {
+function transformMovies(d) {
     d.x = Math.max(d.radius, Math.min(width - d.radius, d.x));
     d.y = Math.max(d.radius, Math.min(height - d.radius, d.y));
+    transform(d);
+}
+
+function transformActors(d) {
+    d.x = Math.max(0, Math.min(width - d.width, d.x));
+    d.y = Math.max(0, Math.min(height - d.height, d.y));
+    transform(d);
+}
+
+function transform(d) {
     return "translate(" + d.x + "," + d.y + ")";
 }
 
@@ -86,6 +116,7 @@ function collide(node) {
                 quad.point.y += y;
             }
         }
+
         return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
     };
 }
