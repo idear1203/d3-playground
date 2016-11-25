@@ -1,7 +1,14 @@
 .node {
     stroke: #222;
     stroke-width: 1.5px;
-    fill: rgb(102, 205, 170);
+}
+
+.node.movie {
+    fill: #66CC99;
+}
+
+.node.actor {
+    fill: #3399FF;
 }
 
 .link {
