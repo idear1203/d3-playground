@@ -25,7 +25,7 @@ d3.json("graph.json", function (error, graph) {
         .start();
 
     var links = svg.selectAll(".link")
-        .data(graph.links)
+        .data(force.links())
         .enter()
         .append("line")
         .attr("class", "link");
@@ -33,7 +33,7 @@ d3.json("graph.json", function (error, graph) {
     var nodes = svg.append("g")
         .attr("class", "nodes")
         .selectAll(".node")
-        .data(graph.nodes)
+        .data(force.nodes())
         .enter().append("g")
         .attr("class", function(d) {
             return "node " + d.label;
@@ -42,54 +42,48 @@ d3.json("graph.json", function (error, graph) {
 
     var movies = d3.selectAll(".movie");
     movies.append("circle")
-        .attr("r", function(d) { return d.radius = 50; });
-
-
+        .attr("r", function(d) { return d.radius = 50; })
     movies.append("title")
-     .text(function(d) {return d.title });
+        .text(function(d) {return d.title });
 
     var actors = d3.selectAll(".actor")
-            .append("rect")
-            .attr("width", function(d) { return d.width = 100; })
-            .attr("height", function(d) {return d.height = 100; });
-
-    actors.append("title")
-     .text(function(d) {return d.name });
+    actors.append("rect")
+        .attr("width", function(d) { return d.width = 100; })
+        .attr("height", function(d) {return d.height = 100; })
+    actors.append("title").text(function(d) {return d.name });
 
     resize();
     d3.select(window).on("resize", resize);
 
-    // html title attribute
-
     // force feed algo ticks
     force.on("tick", function () {
-        var q = d3.geom.quadtree(graph.nodes),
+        var moviedata = movies.data(),
+        q = d3.geom.quadtree(moviedata),
         i = 0,
-        n = graph.nodes.length;
+        n = moviedata.length;
 
-        while (++i < n) q.visit(collide(graph.nodes[i]));
+        while (++i < n) q.visit(collide(moviedata[i]));
 
-        //nodes.attr("transform", transform);
         movies.attr("transform", transformMovies);
         actors.attr("transform", transformActors);
 
         links.attr("x1", function (d) { return d.source.x; })
-        .attr("y1", function (d) { return d.source.y; })
-        .attr("x2", function (d) { return d.target.x; })
-        .attr("y2", function (d) { return d.target.y; });
+            .attr("y1", function (d) { return d.source.y; })
+            .attr("x2", function (d) { return d.target.x; })
+            .attr("y2", function (d) { return d.target.y; });
     });
 });
 
 function transformMovies(d) {
     d.x = Math.max(d.radius, Math.min(width - d.radius, d.x));
     d.y = Math.max(d.radius, Math.min(height - d.radius, d.y));
-    transform(d);
+    return transform(d);
 }
 
 function transformActors(d) {
     d.x = Math.max(0, Math.min(width - d.width, d.x));
     d.y = Math.max(0, Math.min(height - d.height, d.y));
-    transform(d);
+    return transform(d);
 }
 
 function transform(d) {
